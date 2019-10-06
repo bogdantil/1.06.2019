@@ -1,0 +1,164 @@
+#include <iostream>
+#include <vector>
+using namespace std;
+//a - список ребер, b - матрица смежности, с - список смежности, d - матрица инцидентности
+
+vector <int> a1,a2;
+vector <vector<bool>> b;
+vector <vector<int>> с;
+vector <vector<bool>> d;
+
+void a_to_b(int n,int m){
+    b.resize(n);
+    for(int i=0;i<n;i++)b[i].resize(n);
+    for(int i=0;i<m;i++){
+        b[a1[i]][a2[i]]=1;
+        b[a2[i]][a1[i]]=1;
+    }
+}
+
+void a_to_с(int n,int m){
+    g.resize(n);
+    for(int i=0;i<m;i++){
+        с[a1[i]].push_back(a2[i]);
+        с[a2[i]].push_back(a1[i]);
+    }
+}
+
+void a_to_d(int n,int m){
+    d.resize(n);
+    for(int i=0;i<n;i++)im[i].resize(m);
+    for(int i=0;i<m;i++){
+        d[a1[i]][i]=1;
+        d[a2[i]][i]=1;
+    }
+}
+
+void b_to_с(int n,int m){
+    с.resize(n);
+    for(int i=0;i<n;i++){
+        for(int j=i;j<n;j++){
+            if(b[i][j])g[i].push_back(j),с[j].push_back(i);
+        }
+    }
+}
+
+void b_to_d(int n,int m){
+    d.resize(n);
+    for(int i=0;i<n;i++)im[i].resize(m);
+    int k=0;
+    for(int i=0;i<n && k<m;i++){
+        for(int j=i;j<n;j++){
+            if(b[i][j]){
+                d[i][k]=1;
+                d[j][k]=1;
+                k++;
+            }
+        }
+    }
+}
+
+void b_to_a(int n,int m){
+    a1.resize(m),a2.resize(m);
+    int k=0;
+    for(int i=0;i<n;i++){
+        for(int j=i;j<n;j++){
+            if(b[i][j]){
+                a1[k]=i;
+                a2[k]=j;
+                k++;
+            }
+        }
+    }
+}
+
+void с_to_b(int n,int m){
+    b.resize(n);
+    for(int i=0;i<n;i++)am[i].resize(n);
+    for(int i=0;i<n;i++){
+        for(int j=0;j<с[i].size();j++){
+            b[i][с[i][j]]=1;
+            b[g[i][j]][i]=1;
+        }
+    }
+}
+
+void с_to_a(int n,int m){
+    a1.resize(m),a2.resize(m);
+    с_to_b(n,m);
+    b_to_a(n,m);
+}
+
+void с_to_d(int n,int m){
+    с_to_b(n,m);
+    b_to_d(n,m);
+}
+
+void d_to_a(int n,int m){
+    a1.resize(m),a2.resize(m);
+    int k=0;
+    for(int i=0;i<m;i++){
+        bool flag = 0;
+        for(int j=0;j<n;j++){
+            if(d[j][i] && !flag){
+                a1[k]=j;
+                flag = 1;
+            }
+            else if(d[j][i] && flag){
+                a2[k]=j;
+                k++;
+                flag = 0;
+            }
+        }
+    }
+}
+
+void d_to_b(int n,int m){
+    am.resize(n);
+    for(int i=0;i<n;i++)b[i].resize(n);
+    for(int i=0;i<m;i++){
+        for(int j=0;j<n;j++){
+            if(d[j][i]){
+                cout<<j<<" ";
+                for(int k=j+1;k<n;k++){
+                if(d[k][i]){
+                    cout<<k<<'\n';
+                    b[j][k]=1;
+                    b[k][j]=1;
+                    j = k;
+                    break;
+                    }
+                }
+            break;
+            }
+        }
+    }
+}
+
+void d_to_с(int n,int m){
+    с.resize(n);
+    for(int i=0;i<m;i++){
+        for(int j=0;j<n;j++){
+            if(d[j][i]){
+                for(int k=j+1;k<n;k++){
+                    if(d[k][i]){
+                        с[j].push_back(k);
+                        с[k].push_back(j);
+                    }
+                }
+            }
+        }
+    }
+}
+
+int main() {
+    int n,m;
+    cin>>n>>m;
+    a1.resize(m),a2.resize(m);
+    for(int i=0;i<m;i++){
+        int x,y;
+        cin>>x>>y;
+        x--,y--;
+        a1[i]=x,a2[i]=y;
+    }
+}
